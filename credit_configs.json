@@ -1,0 +1,208 @@
+{
+  "lastUpdated": "2025-07-28",
+  "credits": {
+    "wotc": {
+      "enabled": true,
+      "name": "Work Opportunity Tax Credit",
+      "description": "Federal credit for hiring from targeted groups",
+      "maxAnnualCredit": null,
+      "wageCap": 6000,
+      "veteranWageCap": 9600,
+      "categories": {
+        "veterans": {
+          "label": "Veterans",
+          "creditAmount": 5600,
+          "qualificationRate": 0.20,
+          "description": "Military veterans"
+        },
+        "snap": {
+          "label": "SNAP Recipients",
+          "creditAmount": 2400,
+          "qualificationRate": 0.30,
+          "description": "Food stamp recipients"
+        },
+        "long_term_unemployed": {
+          "label": "Long-Term Unemployed",
+          "creditAmount": 2400,
+          "qualificationRate": 0.15,
+          "description": "Unemployed for 27+ weeks"
+        },
+        "vocational_rehab": {
+          "label": "Vocational Rehab Referrals",
+          "creditAmount": 2400,
+          "qualificationRate": 0.10,
+          "description": "Vocational rehabilitation referrals"
+        },
+        "not_sure": {
+          "label": "Not Sure",
+          "creditAmount": 1200,
+          "qualificationRate": 0.10,
+          "description": "Conservative fallback estimate"
+        }
+      }
+    },
+    "rd_payroll": {
+      "enabled": true,
+      "name": "R&D Payroll Offset Credit",
+      "description": "Credit for qualified research expenses against payroll taxes",
+      "maxAnnualCredit": 250000,
+      "creditRate": 0.20,
+      "minimumSpending": 5000,
+      "spendingTiers": {
+        "small": {
+          "range": [5000, 25000],
+          "qualificationRate": 0.60,
+          "averageCredit": 3000
+        },
+        "medium": {
+          "range": [25000, 100000],
+          "qualificationRate": 0.70,
+          "averageCredit": 12000
+        },
+        "large": {
+          "range": [100000, 999999],
+          "qualificationRate": 0.80,
+          "averageCredit": 35000
+        }
+      }
+    },
+    "empowerment_zone": {
+      "enabled": true,
+      "name": "Empowerment Zone Credit",
+      "description": "Credit for employees in designated empowerment zones",
+      "maxCreditPerEmployee": 3000,
+      "creditRate": 0.20,
+      "maxWageBase": 15000,
+      "qualificationRate": 0.15,
+      "zones": [
+        "atlanta_ga",
+        "baltimore_md",
+        "chicago_il",
+        "cleveland_oh",
+        "detroit_mi",
+        "new_york_ny",
+        "philadelphia_pa"
+      ],
+      "zipCodes": {
+        "atlanta_ga": ["30309", "30314", "30318"],
+        "baltimore_md": ["21201", "21202", "21213"],
+        "chicago_il": ["60612", "60624", "60644"],
+        "cleveland_oh": ["44103", "44104", "44108"],
+        "detroit_mi": ["48201", "48202", "48210"],
+        "new_york_ny": ["10026", "10027", "10030"],
+        "philadelphia_pa": ["19132", "19133", "19134"]
+      }
+    },
+    "state_credits": {
+      "enabled": true,
+      "name": "State-Specific Hiring Credits",
+      "description": "State-level hiring incentive programs",
+      "states": {
+        "CA": {
+          "name": "California New Employment Credit",
+          "maxCredit": 5000,
+          "qualificationRate": 0.25,
+          "categories": ["veterans", "ex_offenders", "aid_recipients"],
+          "enabled": true
+        },
+        "NY": {
+          "name": "New York Excelsior Jobs Program",
+          "maxCredit": 3000,
+          "qualificationRate": 0.20,
+          "categories": ["strategic_industry", "net_new_jobs"],
+          "enabled": true
+        },
+        "TX": {
+          "name": "Texas Enterprise Zone Program",
+          "maxCredit": 2500,
+          "qualificationRate": 0.18,
+          "categories": ["local_hire", "enterprise_zone"],
+          "enabled": true
+        },
+        "FL": {
+          "name": "Florida Quick Action Closing Fund",
+          "maxCredit": 2000,
+          "qualificationRate": 0.15,
+          "categories": ["targeted_industry"],
+          "enabled": false
+        }
+      }
+    },
+    "paid_leave": {
+      "enabled": true,
+      "name": "Paid Family and Medical Leave Credit",
+      "description": "State credits for providing paid family/medical leave benefits",
+      "maxAnnualCredit": 300000,
+      "creditRate": 0.25,
+      "qualificationRate": 0.40,
+      "averageCreditPerEmployee": 1200,
+      "statesEligible": ["CA", "NY", "NJ", "RI", "WA", "CT", "MA", "OR"],
+      "requiresEmployerContribution": true
+    },
+    "childcare_support": {
+      "enabled": true,
+      "name": "Childcare Support Tax Credit",
+      "description": "Credits for providing employee childcare assistance",
+      "maxAnnualCredit": 150000,
+      "creditRate": 0.25,
+      "qualificationRate": 0.35,
+      "maxCreditPerEmployee": 5000,
+      "averageCredit": 8000,
+      "qualifyingExpenseTypes": ["onsite_childcare", "childcare_assistance", "dependent_care_fsa"]
+    }
+  },
+  "stackingRules": {
+    "wotc_rd_payroll": {
+      "canStack": true,
+      "note": "Different tax types - no conflict"
+    },
+    "wotc_empowerment_zone": {
+      "canStack": false,
+      "note": "Same employee cannot qualify for both"
+    },
+    "wotc_state_credits": {
+      "canStack": true,
+      "note": "Most states allow stacking with federal credits"
+    },
+    "wotc_paid_leave": {
+      "canStack": true,
+      "note": "Can combine hiring credits with benefit provision credits"
+    },
+    "wotc_childcare_support": {
+      "canStack": true,
+      "note": "Can combine hiring credits with childcare benefits"
+    },
+    "rd_payroll_empowerment_zone": {
+      "canStack": true,
+      "note": "Different qualification criteria"
+    },
+    "rd_payroll_state_credits": {
+      "canStack": true,
+      "note": "No restrictions"
+    },
+    "rd_payroll_paid_leave": {
+      "canStack": true,
+      "note": "Different qualification criteria"
+    },
+    "rd_payroll_childcare_support": {
+      "canStack": true,
+      "note": "Different qualification criteria"
+    },
+    "empowerment_zone_state_credits": {
+      "canStack": "state_dependent",
+      "note": "Varies by state - check individual state rules"
+    },
+    "paid_leave_childcare_support": {
+      "canStack": true,
+      "note": "Different benefit types can be combined"
+    },
+    "state_credits_paid_leave": {
+      "canStack": true,
+      "note": "Most states allow combining hiring and benefit credits"
+    },
+    "state_credits_childcare_support": {
+      "canStack": true,
+      "note": "Most states allow combining hiring and benefit credits"
+    }
+  }
+}
