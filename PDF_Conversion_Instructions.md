@@ -20,7 +20,7 @@ The automatic PDF conversion encountered system library issues on macOS. However
 ### Option 3: VS Code (If you have it)
 1. Install "Markdown PDF" extension
 2. Open the `.md` file in VS Code
-3. Press `Cmd+Shift+P` → "Markdown PDF: Export (pdf)"
+3. Press `Cmd+Shift+P` → "Markdown PDF: Export (pdf)" hello
 
 ### Option 4: Install System Tools
 ```bash
