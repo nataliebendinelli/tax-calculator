@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Credit Calculator - Accrue</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: #f8fafc;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1e3a5f 0%, #5b8db8 100%);
+            color: white;
+            padding: 4rem 1rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'%3E%3Cpath d='M150 50 L350 50 Q400 50 450 100 L550 200 Q600 250 650 300 L750 400 Q800 450 750 500 L650 600 L450 600 Q400 600 350 550 L250 450 Q200 400 150 350 L50 250 Q0 200 50 150 Z' fill='%231e3a5f'/%3E%3Cpath d='M450 100 L550 100 Q600 100 650 150 L750 250 Q800 300 750 350 L650 450 L450 450 Q400 450 350 400 L250 300 Q200 250 250 200 L350 100 Q400 100 450 100 Z' fill='%235b8db8'/%3E%3Crect x='100' y='300' width='40' height='40' fill='%235b8db8'/%3E%3Crect x='150' y='250' width='40' height='40' fill='%235b8db8'/%3E%3Crect x='200' y='200' width='40' height='40' fill='%235b8db8'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-size: contain;
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        .hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero.results-hero {
+            padding: 2rem 1rem 1rem;
+        }
+
+        .hero.results-hero h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .hero .subtitle {
+            font-size: clamp(1.1rem, 3vw, 1.5rem);
+            font-weight: 300;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+        }
+
+        .hero .accent {
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .calculator-section {
+            background: white;
+            margin: -2rem auto 2rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: -50%;
+            width: 100%;
+            height: 2px;
+            background: #e2e8f0;
+            z-index: -1;
+        }
+
+        .progress-step.active:not(:last-child)::after {
+            background: #5b8db8;
+        }
+
+        .progress-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .progress-step.active .progress-number,
+        .progress-step.completed .progress-number {
+            background: #5b8db8;
+            color: white;
+        }
+
+        .progress-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .progress-step.active .progress-label,
+        .progress-step.completed .progress-label {
+            color: #1e3a5f;
+            font-weight: 600;
+        }
+
+        .calculator-content {
+            padding: 0 2rem 2rem;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .step h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #1e3a5f;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #5b8db8;
+            box-shadow: 0 0 0 3px rgba(91, 141, 184, 0.1);
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .input-error {
+            border-color: #e53e3e !important;
+        }
+
+        .yes-no-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .yes-no-option {
+            flex: 1;
+            padding: 0.875rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .yes-no-option:hover {
+            border-color: #5b8db8;
+        }
+
+        .yes-no-option.selected {
+            background: #5b8db8;
+            border-color: #5b8db8;
+            color: white;
+        }
+
+        .yes-no-option:active {
+            transform: translateY(1px);
+        }
+
+        .slider-container {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #7fb069;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .slider-container.show {
+            display: block;
+        }
+
+        .slider-container input[type="range"] {
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        .slider-value {
+            text-align: center;
+            font-weight: 600;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .category-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .category-card:hover {
+            border-color: #5b8db8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-card.selected {
+            background: #5b8db8;
+            border-color: #5b8db8;
+            color: white;
+        }
+
+        .category-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .category-card p {
+            font-size: 0.875rem;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .results-section {
+            text-align: center;
+        }
+
+        .total-credit {
+            background: linear-gradient(135deg, #7fb069 0%, #5b8db8 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .total-credit h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .total-amount {
+            font-size: clamp(4rem, 8vw, 8rem);
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: -0.02em;
+        }
+
+        .total-subtitle {
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .breakdown-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .breakdown-card.has-value {
+            border-color: #7fb069;
+            background: linear-gradient(135deg, #7fb069 0%, rgba(127, 176, 105, 0.1) 100%);
+        }
+
+        .breakdown-card h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .breakdown-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #7fb069;
+        }
+
+        .lead-form {
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-top: 2rem;
+        }
+
+        .lead-form h3 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #1e3a5f;
+            font-weight: 600;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #5b8db8 0%, #1e3a5f 100%);
+            color: white;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(30, 58, 95, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #5b8db8;
+            color: #5b8db8;
+        }
+
+        .btn-secondary:hover {
+            background: #5b8db8;
+            color: white;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+
+        .features-section {
+            padding: 4rem 1rem;
+            background: #7fb069;
+        }
+
+        .features-section h2 {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e3a5f;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: #4a5568;
+            font-weight: 400;
+        }
+
+        .disclaimer {
+            background: #1e3a5f;
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        .thank-you-section {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .thank-you-section h2 {
+            color: #1e3a5f;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .next-steps {
+            background: #7fb069;
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin: 2rem 0;
+        }
+
+        .next-steps h3 {
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .next-steps ul {
+            list-style: none;
+            text-align: left;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .next-steps li {
+            margin-bottom: 0.5rem;
+            font-weight: 400;
+        }
+
+        .next-steps li::before {
+            content: "✓ ";
+            margin-right: 0.5rem;
+        }
+
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f0f0;
+            animation: confetti-fall 3s linear infinite;
+            z-index: 1000;
+        }
+
+        .confetti:nth-child(1) { background: #7fb069; left: 10%; animation-delay: 0s; }
+        .confetti:nth-child(2) { background: #5b8db8; left: 20%; animation-delay: 0.5s; }
+        .confetti:nth-child(3) { background: #1e3a5f; left: 30%; animation-delay: 1s; }
+        .confetti:nth-child(4) { background: #7fb069; left: 40%; animation-delay: 1.5s; }
+        .confetti:nth-child(5) { background: #5b8db8; left: 50%; animation-delay: 0.2s; }
+        .confetti:nth-child(6) { background: #1e3a5f; left: 60%; animation-delay: 0.7s; }
+        .confetti:nth-child(7) { background: #7fb069; left: 70%; animation-delay: 1.2s; }
+        .confetti:nth-child(8) { background: #5b8db8; left: 80%; animation-delay: 1.7s; }
+        .confetti:nth-child(9) { background: #1e3a5f; left: 90%; animation-delay: 0.3s; }
+        .confetti:nth-child(10) { background: #7fb069; left: 15%; animation-delay: 0.8s; }
+        .confetti:nth-child(11) { background: #5b8db8; left: 25%; animation-delay: 1.3s; }
+        .confetti:nth-child(12) { background: #1e3a5f; left: 35%; animation-delay: 1.8s; }
+        .confetti:nth-child(13) { background: #7fb069; left: 45%; animation-delay: 0.4s; }
+        .confetti:nth-child(14) { background: #5b8db8; left: 55%; animation-delay: 0.9s; }
+        .confetti:nth-child(15) { background: #1e3a5f; left: 65%; animation-delay: 1.4s; }
+        .confetti:nth-child(16) { background: #7fb069; left: 75%; animation-delay: 1.9s; }
+        .confetti:nth-child(17) { background: #5b8db8; left: 85%; animation-delay: 0.6s; }
+        .confetti:nth-child(18) { background: #1e3a5f; left: 95%; animation-delay: 1.1s; }
+        .confetti:nth-child(19) { background: #7fb069; left: 5%; animation-delay: 1.6s; }
+        .confetti:nth-child(20) { background: #5b8db8; left: 12%; animation-delay: 0.1s; }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .celebration-text {
+            animation: celebration-bounce 0.6s ease-in-out;
+        }
+
+        @keyframes celebration-bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero" id="main-hero">
+        <div class="container">
+            <h1>Discover Your <span class="accent">Hidden</span> Tax Credits</h1>
+            <p class="subtitle">Most businesses miss out on <span class="accent">thousands</span> in available tax credits. See what you qualify for in under 3 minutes.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="calculator-section">
+            <div class="progress-bar">
+                <div class="progress-step active" data-step="1">
+                    <div class="progress-number">1</div>
+                    <div class="progress-label">Hires</div>
+                </div>
+                <div class="progress-step" data-step="2">
+                    <div class="progress-number">2</div>
+                    <div class="progress-label">Business</div>
+                </div>
+                <div class="progress-step" data-step="3">
+                    <div class="progress-number">3</div>
+                    <div class="progress-label">Categories</div>
+                </div>
+                <div class="progress-step" data-step="4">
+                    <div class="progress-number">4</div>
+                    <div class="progress-label">Results</div>
+                </div>
+            </div>
+
+            <div class="calculator-content">
+                <!-- Step 1: Total Hires -->
+                <div class="step active" id="step-1">
+                    <h2>How many people have you hired in the last 12 months?</h2>
+                    <div class="form-group">
+                        <input type="number" id="totalHires" placeholder="Enter number of hires" min="1">
+                        <div class="error-message" id="hires-error" style="display: none;">Please enter at least 1 hire</div>
+                    </div>
+                    <div class="navigation-buttons">
+                        <div></div>
+                        <button class="btn" onclick="nextStep()">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Business Profile -->
+                <div class="step" id="step-2">
+                    <h2>Tell us about your business</h2>
+                    
+                    <div class="form-group">
+                        <label for="state">What state is your business located in?</label>
+                        <select id="state">
+                            <option value="">Select your state</option>
+                            <option value="CA">California</option>
+                            <option value="NY">New York</option>
+                            <option value="TX">Texas</option>
+                            <option value="FL">Florida</option>
+                            <option value="IL">Illinois</option>
+                            <option value="PA">Pennsylvania</option>
+                            <option value="OH">Ohio</option>
+                            <option value="GA">Georgia</option>
+                            <option value="NC">North Carolina</option>
+                            <option value="MI">Michigan</option>
+                            <option value="other">None of these</option>
+                        </select>
+                        <div class="error-message" id="state-error" style="display: none;">Please select your state</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="zipCode">ZIP Code (optional)</label>
+                        <input type="text" id="zipCode" placeholder="Enter ZIP code">
+                    </div>
+
+                    <div class="form-group" id="rd-group">
+                        <label>Does your business spend money on research & development?</label>
+                        <div class="yes-no-group">
+                            <div class="yes-no-option" onclick="toggleRD(true)">Yes</div>
+                            <div class="yes-no-option" onclick="toggleRD(false)">No</div>
+                        </div>
+                        <div class="slider-container" id="rd-slider">
+                            <label>Annual R&D spending:</label>
+                            <input type="range" id="rdAmount" min="5000" max="500000" step="5000" value="50000" oninput="updateSliderValue()">
+                            <div class="slider-value" id="rd-value">$50,000</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="paid-leave-group">
+                        <label>Does your business offer paid family leave?</label>
+                        <div class="yes-no-group">
+                            <div class="yes-no-option" onclick="togglePaidLeave(true)">Yes</div>
+                            <div class="yes-no-option" onclick="togglePaidLeave(false)">No</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="childcare-group">
+                        <label>Does your business provide childcare support?</label>
+                        <div class="yes-no-group">
+                            <div class="yes-no-option" onclick="toggleChildcare(true)">Yes</div>
+                            <div class="yes-no-option" onclick="toggleChildcare(false)">No</div>
+                        </div>
+                    </div>
+
+                    <div class="navigation-buttons">
+                        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                        <button class="btn" onclick="nextStep()">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Employee Categories -->
+                <div class="step" id="step-3">
+                    <h2>Which categories describe your recent hires?</h2>
+                    <p style="text-align: center; margin-bottom: 2rem; color: #64748b; font-style: italic;">Select all that apply to see your potential credits</p>
+                    
+                    <div class="categories-grid" id="categories-container">
+                        <!-- Categories will be populated by JavaScript -->
+                    </div>
+
+                    <div class="error-message" id="categories-error" style="display: none; text-align: center; margin-top: 1rem;">Please select at least one category</div>
+
+                    <div class="navigation-buttons">
+                        <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                        <button class="btn" onclick="nextStep()">See My Results</button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Results -->
+                <div class="step" id="step-4">
+                    <div class="results-section">
+                        <div class="total-credit" id="results-card">
+                            <h3 class="celebration-text">🎉 Your Estimated Tax Credits 🎉</h3>
+                            <div class="total-amount" id="total-amount">$0</div>
+                            <p class="total-subtitle">in potential annual savings - Congratulations!</p>
+                        </div>
+
+                        <div class="breakdown-grid" id="breakdown-container">
+                            <!-- Breakdown cards will be populated by JavaScript -->
+                        </div>
+
+                        <div class="lead-form">
+                            <h3>Get Your Complete Credit Analysis</h3>
+                            <p style="margin-bottom: 1.5rem; color: #64748b; font-style: italic;">Our experts will verify your eligibility and help you claim these credits</p>
+                            
+                            <form id="lead-capture-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <input type="text" id="firstName" placeholder="First Name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" id="lastName" placeholder="Last Name" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <input type="email" id="email" placeholder="Email Address" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="tel" id="phone" placeholder="Phone Number" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="company" placeholder="Company Name" required>
+                                </div>
+                                
+                                <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">
+                                    Get My Complete Analysis
+                                </button>
+                            </form>
+                            
+                            <p style="margin-top: 1rem; font-size: 0.875rem; color: #64748b; font-weight: 300;">
+                                ✓ <span class="accent">90-day</span> money-back guarantee<br>
+                                ✓ No upfront costs - we only get paid when you save
+                            </p>
+                        </div>
+
+                        <div class="navigation-buttons">
+                            <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                            <button class="btn btn-secondary" onclick="resetCalculator()">Start Over</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Thank You -->
+                <div class="step" id="step-5">
+                    <div class="thank-you-section">
+                        <h2>Thank you! We've received your information.</h2>
+                        <p style="margin-bottom: 2rem; font-size: 1.1rem; color: #64748b;">
+                            Our team will review your <strong id="thank-you-amount">$0</strong> in potential credits and contact you within 24 hours.
+                        </p>
+
+                        <div class="next-steps">
+                            <h3>What happens next?</h3>
+                            <ul>
+                                <li>We'll verify your eligibility for each credit</li>
+                                <li>Our experts will prepare your applications</li>
+                                <li>We'll handle all IRS communications</li>
+                                <li>You'll receive your credits within 90 days</li>
+                            </ul>
+                        </div>
+
+                        <p style="margin: 2rem 0; color: #64748b;">
+                            <strong>Questions?</strong> Call us at <strong>(555) 123-4567</strong> or email <strong>hello@accrue.com</strong>
+                        </p>
+
+                        <button class="btn" onclick="resetCalculator()">Calculate Again</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="features-section">
+        <div class="container">
+            <h2>Why Choose <span class="accent">Accrue</span>?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>✓ Guaranteed Results</h3>
+                    <p>We guarantee you'll receive credits within 90 days or your money back. Our success rate is over 95%.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✓ No Upfront Costs</h3>
+                    <p>We only get paid when you save. Our fee is a small percentage of the credits we secure for you.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✓ Expert Handling</h3>
+                    <p>Our team of tax professionals handles everything from applications to IRS communications.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✓ Fast Processing</h3>
+                    <p>Our streamlined process typically secures your credits in under 60 days, faster than industry average.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="disclaimer">
+        <div class="container">
+            <p>This calculator provides estimates based on general qualification criteria. Actual credit amounts may vary based on specific circumstances and IRS regulations. Consult with tax professionals for personalized advice.</p>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let calculatorData = {
+            totalHires: 0,
+            state: '',
+            zipCode: '',
+            hasRD: false,
+            rdAmount: 50000,
+            hasPaidLeave: false,
+            hasChildcare: false,
+            selectedCategories: []
+        };
+
+        // Credit calculation data
+        const creditData = {
+            wotc: {
+                veterans: { rate: 0.20, amount: 5600 },
+                snap: { rate: 0.30, amount: 2400 },
+                longTermUnemployed: { rate: 0.15, amount: 2400 },
+                vocationalRehab: { rate: 0.10, amount: 2400 },
+                notSure: { rate: 0.10, amount: 1200 },
+                empowermentZone: { rate: 0.15, amount: 3000 }
+            },
+            rdPayroll: {
+                small: { min: 5000, max: 25000, rate: 0.60, creditRate: 0.20 },
+                medium: { min: 25000, max: 100000, rate: 0.70, creditRate: 0.20 },
+                large: { min: 100000, max: 999999, rate: 0.80, creditRate: 0.20 }
+            },
+            paidLeave: {
+                states: ["CA", "NY", "NJ", "RI", "WA", "CT", "MA", "OR"],
+                maxAnnual: 300000,
+                avgPerEmployee: 1200,
+                qualificationRate: 0.40
+            },
+            childcare: {
+                maxAnnual: 150000,
+                avgPerBusiness: 8000,
+                qualificationRate: 0.35
+            },
+            stateCredits: {
+                CA: { rate: 0.25, amount: 5000, name: "California New Employment Credit" },
+                NY: { rate: 0.20, amount: 3000, name: "New York Excelsior Jobs Program" },
+                TX: { rate: 0.18, amount: 2500, name: "Texas Enterprise Zone Program" }
+            }
+        };
+
+        function nextStep() {
+            if (validateStep(currentStep)) {
+                if (currentStep === 2) {
+                    updateCategoryOptions();
+                }
+                if (currentStep === 3) {
+                    updateResults();
+                }
+                currentStep++;
+                updateUI();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            // Hide all steps
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            // Show current step
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            
+            // Update progress bar
+            document.querySelectorAll('.progress-step').forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                } else if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                }
+            });
+        }
+
+        function validateStep(step) {
+            switch (step) {
+                case 1:
+                    const hires = parseInt(document.getElementById('totalHires').value);
+                    if (!hires || hires < 1) {
+                        showError('hires-error', 'totalHires');
+                        return false;
+                    }
+                    calculatorData.totalHires = hires;
+                    hideError('hires-error', 'totalHires');
+                    return true;
+
+                case 2:
+                    const state = document.getElementById('state').value;
+                    if (!state) {
+                        showError('state-error', 'state');
+                        return false;
+                    }
+                    calculatorData.state = state;
+                    calculatorData.zipCode = document.getElementById('zipCode').value;
+                    hideError('state-error', 'state');
+                    return true;
+
+                case 3:
+                    if (calculatorData.selectedCategories.length === 0) {
+                        showError('categories-error');
+                        return false;
+                    }
+                    hideError('categories-error');
+                    return true;
+
+                default:
+                    return true;
+            }
+        }
+
+        function showError(errorId, inputId = null) {
+            document.getElementById(errorId).style.display = 'block';
+            if (inputId) {
+                document.getElementById(inputId).classList.add('input-error');
+            }
+        }
+
+        function hideError(errorId, inputId = null) {
+            document.getElementById(errorId).style.display = 'none';
+            if (inputId) {
+                document.getElementById(inputId).classList.remove('input-error');
+            }
+        }
+
+        function toggleRD(hasRD) {
+            calculatorData.hasRD = hasRD;
+            
+            // Update button states
+            const buttons = document.querySelectorAll('#rd-group .yes-no-option');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            
+            if (hasRD) {
+                buttons[0].classList.add('selected');
+                document.getElementById('rd-slider').classList.add('show');
+            } else {
+                buttons[1].classList.add('selected');
+                document.getElementById('rd-slider').classList.remove('show');
+            }
+        }
+
+        function updateSliderValue() {
+            const value = parseInt(document.getElementById('rdAmount').value);
+            calculatorData.rdAmount = value;
+            document.getElementById('rd-value').textContent = '$' + value.toLocaleString();
+        }
+
+        function togglePaidLeave(hasPaidLeave) {
+            calculatorData.hasPaidLeave = hasPaidLeave;
+            
+            const buttons = document.querySelectorAll('#paid-leave-group .yes-no-option');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            
+            if (hasPaidLeave) {
+                buttons[0].classList.add('selected');
+            } else {
+                buttons[1].classList.add('selected');
+            }
+        }
+
+        function toggleChildcare(hasChildcare) {
+            calculatorData.hasChildcare = hasChildcare;
+            
+            const buttons = document.querySelectorAll('#childcare-group .yes-no-option');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            
+            if (hasChildcare) {
+                buttons[0].classList.add('selected');
+            } else {
+                buttons[1].classList.add('selected');
+            }
+        }
+
+        function updateCategoryOptions() {
+            const container = document.getElementById('categories-container');
+            let categories = [
+                { id: 'veterans', title: 'Veterans', description: 'Hired veterans or active military' },
+                { id: 'snap', title: 'SNAP Recipients', description: 'Hired individuals receiving food assistance' },
+                { id: 'longTermUnemployed', title: 'Long-term Unemployed', description: 'Hired people unemployed 27+ weeks' },
+                { id: 'vocationalRehab', title: 'Vocational Rehabilitation', description: 'Hired through vocational rehab programs' },
+                { id: 'notSure', title: 'Not Sure', description: "I'm not sure about specific categories" }
+            ];
+
+            // Add empowerment zone if in qualifying ZIP
+            if (isEmpowermentZone(calculatorData.zipCode)) {
+                categories.push({
+                    id: 'empowermentZone',
+                    title: 'Empowerment Zone Residents',
+                    description: 'Hired residents from empowerment zones'
+                });
+            }
+
+            container.innerHTML = categories.map(cat => `
+                <div class="category-card" onclick="toggleCategory('${cat.id}')">
+                    <h3>${cat.title}</h3>
+                    <p>${cat.description}</p>
+                </div>
+            `).join('');
+        }
+
+        function toggleCategory(categoryId) {
+            const card = event.currentTarget;
+            const index = calculatorData.selectedCategories.indexOf(categoryId);
+            
+            if (index > -1) {
+                calculatorData.selectedCategories.splice(index, 1);
+                card.classList.remove('selected');
+            } else {
+                calculatorData.selectedCategories.push(categoryId);
+                card.classList.add('selected');
+            }
+        }
+
+        function isEmpowermentZone(zipCode) {
+            const empowermentZones = ['90210', '10001', '60601', '33101']; // Example ZIP codes
+            return empowermentZones.includes(zipCode);
+        }
+
+        function updateResults() {
+            const results = calculateCredits();
+            
+            // Change hero section for results page
+            const hero = document.getElementById('main-hero');
+            const heroContainer = hero.querySelector('.container');
+            hero.classList.add('results-hero');
+            heroContainer.innerHTML = `
+                <h1>WOW, Your Tax Credits Are <span class="accent">HUGE!</span></h1>
+                <p class="subtitle">Look at these incredible savings waiting for you!</p>
+            `;
+            
+            // Update total amount
+            document.getElementById('total-amount').textContent = '$' + results.total.toLocaleString();
+            
+            // Trigger confetti celebration
+            setTimeout(() => {
+                createConfetti();
+            }, 500);
+            
+            // Update breakdown
+            const breakdown = document.getElementById('breakdown-container');
+            breakdown.innerHTML = `
+                <div class="breakdown-card ${results.wotc > 0 ? 'has-value' : ''}">
+                    <h4>WOTC Credits</h4>
+                    <div class="breakdown-amount">$${results.wotc.toLocaleString()}</div>
+                </div>
+                <div class="breakdown-card ${results.rdPayroll > 0 ? 'has-value' : ''}">
+                    <h4>R&D Payroll</h4>
+                    <div class="breakdown-amount">$${results.rdPayroll.toLocaleString()}</div>
+                </div>
+                <div class="breakdown-card ${results.paidLeave > 0 ? 'has-value' : ''}">
+                    <h4>Paid Leave</h4>
+                    <div class="breakdown-amount">$${results.paidLeave.toLocaleString()}</div>
+                </div>
+                <div class="breakdown-card ${results.childcare > 0 ? 'has-value' : ''}">
+                    <h4>Childcare</h4>
+                    <div class="breakdown-amount">$${results.childcare.toLocaleString()}</div>
+                </div>
+                <div class="breakdown-card ${results.stateCredits > 0 ? 'has-value' : ''}">
+                    <h4>State Credits</h4>
+                    <div class="breakdown-amount">$${results.stateCredits.toLocaleString()}</div>
+                </div>
+                <div class="breakdown-card ${results.empowermentZone > 0 ? 'has-value' : ''}">
+                    <h4>Empowerment Zone</h4>
+                    <div class="breakdown-amount">$${results.empowermentZone.toLocaleString()}</div>
+                </div>
+            `;
+        }
+
+        function calculateCredits() {
+            let results = {
+                wotc: 0,
+                rdPayroll: 0,
+                paidLeave: 0,
+                childcare: 0,
+                stateCredits: 0,
+                empowermentZone: 0,
+                total: 0
+            };
+
+            // WOTC Calculations
+            calculatorData.selectedCategories.forEach(category => {
+                if (creditData.wotc[category]) {
+                    const credit = creditData.wotc[category];
+                    const hiresToUse = Math.min(calculatorData.totalHires * credit.rate, calculatorData.totalHires);
+                    results.wotc += hiresToUse * credit.amount;
+                }
+            });
+
+            // R&D Payroll Credit
+            if (calculatorData.hasRD && calculatorData.rdAmount >= 5000) {
+                let tier;
+                if (calculatorData.rdAmount <= 25000) tier = creditData.rdPayroll.small;
+                else if (calculatorData.rdAmount <= 100000) tier = creditData.rdPayroll.medium;
+                else tier = creditData.rdPayroll.large;
+                
+                results.rdPayroll = Math.min(calculatorData.rdAmount * tier.rate * tier.creditRate, 250000);
+            }
+
+            // Paid Family Leave Credit
+            if (calculatorData.hasPaidLeave && creditData.paidLeave.states.includes(calculatorData.state)) {
+                const qualifyingEmployees = calculatorData.totalHires * creditData.paidLeave.qualificationRate;
+                results.paidLeave = Math.min(
+                    qualifyingEmployees * creditData.paidLeave.avgPerEmployee,
+                    creditData.paidLeave.maxAnnual
+                );
+            }
+
+            // Childcare Credit
+            if (calculatorData.hasChildcare) {
+                results.childcare = Math.min(
+                    creditData.childcare.avgPerBusiness * creditData.childcare.qualificationRate,
+                    creditData.childcare.maxAnnual
+                );
+            }
+
+            // State Credits
+            if (creditData.stateCredits[calculatorData.state]) {
+                const stateCredit = creditData.stateCredits[calculatorData.state];
+                results.stateCredits = calculatorData.totalHires * stateCredit.rate * stateCredit.amount;
+            }
+
+            // Empowerment Zone (if qualified)
+            if (calculatorData.selectedCategories.includes('empowermentZone')) {
+                const credit = creditData.wotc.empowermentZone;
+                const hiresToUse = Math.min(calculatorData.totalHires * credit.rate, calculatorData.totalHires);
+                results.empowermentZone = hiresToUse * credit.amount;
+            }
+
+            results.total = Object.values(results).reduce((sum, val) => sum + val, 0) - results.total;
+            
+            return results;
+        }
+
+        function submitLead() {
+            const form = document.getElementById('lead-capture-form');
+            const results = calculateCredits();
+            
+            // Update thank you amount
+            document.getElementById('thank-you-amount').textContent = '$' + results.total.toLocaleString();
+            
+            // Move to thank you step
+            currentStep = 5;
+            updateUI();
+        }
+
+        function resetCalculator() {
+            currentStep = 1;
+            calculatorData = {
+                totalHires: 0,
+                state: '',
+                zipCode: '',
+                hasRD: false,
+                rdAmount: 50000,
+                hasPaidLeave: false,
+                hasChildcare: false,
+                selectedCategories: []
+            };
+            
+            // Reset form values
+            document.getElementById('totalHires').value = '';
+            document.getElementById('state').value = '';
+            document.getElementById('zipCode').value = '';
+            document.getElementById('rdAmount').value = 50000;
+            updateSliderValue();
+            
+            // Reset button states
+            document.querySelectorAll('.yes-no-option').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById('rd-slider').classList.remove('show');
+            
+            updateUI();
+        }
+
+        // Confetti creation function
+        function createConfetti() {
+            const confettiContainer = document.createElement('div');
+            confettiContainer.style.position = 'fixed';
+            confettiContainer.style.top = '0';
+            confettiContainer.style.left = '0';
+            confettiContainer.style.width = '100%';
+            confettiContainer.style.height = '100%';
+            confettiContainer.style.pointerEvents = 'none';
+            confettiContainer.style.zIndex = '1000';
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.backgroundColor = getRandomColor();
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                confettiContainer.appendChild(confetti);
+            }
+            
+            document.body.appendChild(confettiContainer);
+            
+            // Remove confetti after animation
+            setTimeout(() => {
+                document.body.removeChild(confettiContainer);
+            }, 5000);
+        }
+        
+        function getRandomColor() {
+            const colors = ['#7fb069', '#5b8db8', '#1e3a5f', '#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        // Form submission handler
+        document.getElementById('lead-capture-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            submitLead();
+        });
+
+        // Initialize
+        updateSliderValue();
+    </script>
+</body>
+</html>

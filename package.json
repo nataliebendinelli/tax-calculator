@@ -1,0 +1,17 @@
+{
+  "name": "tax-credit-calculator",
+  "version": "1.0.0",
+  "description": "Multi-credit tax calculator for businesses",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 3000",
+    "build": "echo 'No build process needed - static HTML/CSS/JS'",
+    "start": "python -m http.server 8080"
+  },
+  "keywords": ["tax", "calculator", "credits", "business"],
+  "author": "Accrue",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
